@@ -1,0 +1,43 @@
+# ==========================================
+# Python & Virtual Environments
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+*.egg-info/
+
+# ==========================================
+# Jupyter Notebooks
+# ==========================================
+.ipynb_checkpoints/
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Logs & Environment Variables
+# ==========================================
+*.log
+.env
+
+# ==========================================
+# Machine Learning Model Exceptions
+# ==========================================
+# Standard .gitignore files block .joblib and .pkl files.
+# We explicitly force Git to track your trained model:
+!model/bangla_topic_model.joblib

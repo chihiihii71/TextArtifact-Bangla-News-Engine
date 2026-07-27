@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>Bangla News Intelligence Engine — Demo</title>
+<style>
+  body { font-family: sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+  textarea { width: 100%; height: 140px; font-size: 15px; padding: 8px; }
+  input[type=text] { width: 100%; padding: 8px; font-size: 15px; }
+  button { padding: 10px 18px; font-size: 15px; margin: 8px 8px 8px 0; cursor: pointer; }
+  .result { background: #f5f5f5; padding: 14px; border-radius: 6px; margin-top: 12px; white-space: pre-wrap; }
+  label { font-weight: bold; display: block; margin-top: 16px; }
+  h1 { font-size: 22px; }
+  .row { display: flex; gap: 8px; align-items: center; }
+</style>
+</head>
+<body>
+  <h1>Bangla News Intelligence Engine</h1>
+  <p>Paste a Bangla news article to classify it, check for near-duplicates, and store it.</p>
+
+  <label>Article ID</label>
+  <input id="articleId" type="text" placeholder="e.g. article-001" value="demo-1">
+
+  <label>Article Text</label>
+  <textarea id="articleText" placeholder="আপনার বাংলা আর্টিকেলের টেক্সট এখানে পেস্ট করুন..."></textarea>
+
+  <div class="row">
+    <button onclick="classifyOnly()">Classify Only</button>
+    <button onclick="ingest()">Ingest (Classify + Duplicate Check + Store)</button>
+  </div>
+  <div id="ingestResult" class="result" style="display:none;"></div>
+
+  <hr style="margin-top:32px;">
+
+  <label>Browse Feed by Topic</label>
+  <div class="row">
+    <input id="feedTopic" type="text" placeholder="e.g. National" style="flex:1;">
+    <label style="font-weight:normal; margin:0; display:flex; align-items:center; gap:4px;">
+      <input id="excludeDup" type="checkbox" checked> Exclude duplicates
+    </label>
+    <button onclick="getFeed()">Get Feed</button>
+  </div>
+  <div id="feedResult" class="result" style="display:none;"></div>
+
+<script>
+async function classifyOnly() {
+  const text = document.getElementById('articleText').value;
+  const res = await fetch('/classify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text})
+  });
+  const data = await res.json();
+  const el = document.getElementById('ingestResult');
+  el.style.display = 'block';
+  el.textContent = JSON.stringify(data, null, 2);
+}
+
+async function ingest() {
+  const article_id = document.getElementById('articleId').value;
+  const text = document.getElementById('articleText').value;
+  const res = await fetch('/ingest', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({article_id, text})
+  });
+  const data = await res.json();
+  const el = document.getElementById('ingestResult');
+  el.style.display = 'block';
+  el.textContent = JSON.stringify(data, null, 2);
+}
+
+async function getFeed() {
+  const topic = document.getElementById('feedTopic').value;
+  const exclude = document.getElementById('excludeDup').checked;
+  const res = await fetch(`/feed?topic=${encodeURIComponent(topic)}&exclude_duplicates=${exclude}`);
+  const data = await res.json();
+  const el = document.getElementById('feedResult');
+  el.style.display = 'block';
+  el.textContent = JSON.stringify(data, null, 2);
+}
+</script>
+</body>
+</html>
