@@ -1,151 +1,512 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global & National Crisis Monitor</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #121212; color: #ffffff; padding: 20px; margin: 0; }
-        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #333; margin-bottom: 30px; }
-        .header h1 { color: #ff4444; margin-bottom: 5px; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; max-width: 1300px; margin: auto; }
-        .lang-card { background: #1e1e1e; border-top: 4px solid #00bcd4; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .lang-title { font-size: 1.2em; font-weight: bold; color: #00bcd4; text-transform: uppercase; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
-        
-        .crisis-box { background: #3e1f1f; border: 1px solid #ff4444; border-radius: 6px; padding: 15px; margin-top: 10px; }
-        .crisis-headline { font-size: 1.1em; font-weight: bold; color: #ff8888; margin-bottom: 10px; }
-        .no-crisis { background: #1b4332; border: 1px solid #2d6a4f; padding: 15px; border-radius: 6px; color: #a3b18a; text-align: center; }
-        
-        .metric { font-weight: bold; color: #ffca28; }
-        .threat-tag { display: inline-block; background: #ff4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.75em; margin-right: 4px; margin-top: 5px; }
+<meta charset="UTF-8">
+<title>SIGNAL WIRE — Underreported Crisis Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700;8..60,800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-        /* Ingestion Panel */
-        .ingest-panel { max-width: 1300px; margin: 40px auto; background: #1e1e1e; padding: 30px; border-radius: 8px; border-top: 4px solid #007bff; }
-        textarea { width: 100%; height: 120px; background: #2d2d2d; color: white; border: 1px solid #444; border-radius: 5px; padding: 10px; margin-bottom: 15px; box-sizing: border-box; }
-        select, input[type="text"] { padding: 8px; background: #2d2d2d; color: white; border: 1px solid #444; margin-bottom: 15px; margin-right: 15px; }
-        button { background-color: #007bff; color: white; border: none; padding: 10px 20px; font-size: 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #0056b3; }
-    </style>
+  :root {
+    --ink: #111315;
+    --paper: #FFFFFF;
+    --paper-dim: #F5F4F1;
+    --rule: #DCDAD3;
+    --muted: #5B5F63;
+    --crimson: #A31621;
+    --amber: #9A6300;
+    --teal: #1E6E5C;
+    --link: #0B4C8C;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Utility bar */
+  .utility-bar {
+    background: var(--ink);
+    color: #fff;
+    padding: 7px 24px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.02em;
+  }
+  .utility-bar .badge-live {
+    background: var(--crimson);
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-weight: 600;
+    margin-left: 10px;
+  }
+
+  /* Masthead */
+  .masthead {
+    padding: 22px 24px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--ink);
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  .wordmark {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: -0.01em;
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .wordmark .sub { color: var(--crimson); }
+  .wordmark small {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .masthead-right { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  /* Category nav */
+  .cat-nav {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+  }
+  .cat-btn {
+    background: none;
+    border: none;
+    padding: 12px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+  }
+  .cat-btn:hover { color: var(--crimson); }
+  .cat-btn.active { color: var(--crimson); border-bottom-color: var(--crimson); }
+
+  /* Language ticker */
+  .lang-ticker {
+    background: var(--paper-dim);
+    border-bottom: 1px solid var(--rule);
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 9px 24px;
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    align-items: center;
+  }
+  .lang-pill {
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 3px 9px;
+    cursor: pointer;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lang-pill.active { border-color: var(--crimson); color: var(--crimson); background: #FBEEEE; }
+  .lang-pill .count { color: var(--ink); font-weight: 600; }
+  .lang-pill .flag-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  .lang-pill .flag-dot.under { background: var(--amber); }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 28px 24px 80px; }
+
+  /* Lead grid */
+  .lead-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 32px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 32px;
+  }
+  @media (max-width: 800px) { .lead-grid { grid-template-columns: 1fr; } }
+
+  .lead-media {
+    height: 320px;
+    background: linear-gradient(135deg, var(--ink) 0%, #2B2F33 100%);
+    border-radius: 2px;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .lead-media::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 40px);
+  }
+  .lead-media .cat-tag {
+    color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    background: var(--crimson); padding: 3px 8px; border-radius: 2px;
+  }
+
+  .lead-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--crimson);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .lead-grid h1 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 30px;
+    line-height: 1.18;
+    margin: 0 0 12px;
+    font-weight: 700;
+  }
+  .lead-grid p.snip { color: var(--muted); font-size: 15px; line-height: 1.6; margin: 0 0 14px; }
+  .byline { font-size: 12px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
+
+  .signal-box {
+    background: var(--paper-dim);
+    border: 1px solid var(--rule);
+    padding: 16px 18px;
+    margin-top: 18px;
+    border-radius: 2px;
+  }
+  .signal-box h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); margin: 0 0 10px; font-weight: 600;
+  }
+  .sig-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+  .sig-row .v { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+  .sig-row .v.amber { color: var(--amber); }
+  .sig-row .v.crimson { color: var(--crimson); }
+
+  /* Story grid */
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 8px;
+    margin: 36px 0 18px;
+  }
+  .section-header h2 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 20px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .section-header span { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .story-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+  @media (max-width: 900px) { .story-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .story-grid { grid-template-columns: 1fr; } }
+
+  .story-card { border-bottom: 1px solid var(--rule); padding-bottom: 18px; }
+  .story-thumb {
+    height: 110px;
+    background: var(--paper-dim);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .story-card .cat-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--crimson); margin-bottom: 6px; font-weight: 600;
+  }
+  .story-card h3 {
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px; line-height: 1.3; margin: 0 0 8px; font-weight: 600;
+  }
+  .story-card p { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0 0 10px; }
+  .story-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-family: 'IBM Plex Mono', monospace; }
+  .story-footer .lang { color: var(--muted); }
+  .badge { padding: 2px 7px; border-radius: 2px; font-size: 10px; font-weight: 600; }
+  .badge.under { background: #FBF3E1; color: var(--amber); border: 1px solid #E9D6A3; }
+  .badge.covered { background: #E7F2EF; color: var(--teal); border: 1px solid #BFDCD3; }
+  .empty-state { color: #8A8E92; font-size: 13px; font-style: italic; padding: 30px 0; text-align: center; grid-column: 1 / -1; }
+
+  /* Submit panel */
+  .submit-toggle { margin-top: 44px; text-align: center; }
+  .submit-toggle button {
+    background: none; border: 1px solid var(--ink); color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
+    padding: 10px 20px; border-radius: 2px; cursor: pointer;
+  }
+  .submit-toggle button:hover { background: var(--ink); color: #fff; }
+  .submit-panel {
+    max-width: 640px; margin: 20px auto 0; background: var(--paper-dim);
+    border: 1px solid var(--rule); padding: 24px; display: none;
+  }
+  .submit-panel.open { display: block; }
+  .submit-panel h3 { font-family: 'IBM Plex Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0 0 16px; }
+  .submit-panel label { display: block; font-size: 12px; color: var(--muted); margin: 14px 0 6px; font-weight: 600; }
+  .submit-panel select, .submit-panel input, .submit-panel textarea {
+    width: 100%; background: #fff; border: 1px solid var(--rule); border-radius: 2px;
+    color: var(--ink); padding: 9px 10px; font-family: 'Inter', sans-serif; font-size: 13px;
+  }
+  .submit-panel textarea { min-height: 90px; resize: vertical; }
+  .submit-panel button.submit-btn {
+    margin-top: 16px; background: var(--crimson); color: #fff; border: none;
+    padding: 10px 18px; border-radius: 2px; font-size: 13px; font-weight: 700; cursor: pointer;
+  }
+  .submit-panel button.submit-btn:hover { opacity: 0.88; }
+  .eval-result { margin-top: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); white-space: pre-wrap; }
+</style>
 </head>
 <body>
 
-<div class="header">
-    <h1>🚨 Global & National Crisis Monitor</h1>
-    <p>Real-time tracking of the single most concerning news article across 6 major languages</p>
+<div class="utility-bar">
+  <span>Scanning Bangla · English · Español · Français · Deutsch · العربية · Kiswahili · Hausa · አማርኛ<span class="badge-live">LIVE</span></span>
+  <span id="utilTime"></span>
 </div>
 
-<!-- 6 LANGUAGE CRISIS GRID -->
-<div class="grid-container" id="crisisGrid">
-    <!-- Populated dynamically via JavaScript -->
+<div class="masthead">
+  <h1 class="wordmark">SIGNAL <span class="sub">WIRE</span><br><small>the underreported crisis monitor</small></h1>
+  <div class="masthead-right" id="tickerStat"></div>
 </div>
 
-<!-- INGESTION TOOL TO TEST & PUSH NEW CRISIS ARTICLES -->
-<div class="ingest-panel">
-    <h2>Test & Ingest Article</h2>
-    <p style="color: #aaa; font-size: 0.9em;">Paste an article snippet in any language to test if it overrides the top concerning news for that region.</p>
-    
-    <div>
-        <label>Language Region:</label>
-        <select id="inputLang">
-            <option value="bn">Bangla (বাংলা)</option>
-            <option value="en">English</option>
-            <option value="es">Spanish (Español)</option>
-            <option value="de">German (Deutsch)</option>
-            <option value="fr">French (Français)</option>
-            <option value="ar">Arabic (العربية)</option>
-        </select>
-        
-        <label>Title:</label>
-        <input type="text" id="inputTitle" placeholder="Article headline..." style="width: 300px;">
-    </div>
+<div class="cat-nav" id="catNav"></div>
+<div class="lang-ticker" id="langTicker"></div>
 
-    <textarea id="inputText" placeholder="Paste article content containing crisis keywords (e.g., earthquake, flood, attack, emergency)..."></textarea>
-    <button onclick="submitArticle()">Publish / Evaluate Article</button>
-</div>
+<main>
+  <div id="leadContainer"></div>
+
+  <div class="section-header">
+    <h2 id="sectionTitle">All dispatches</h2>
+    <span id="sectionCount"></span>
+  </div>
+  <div class="story-grid" id="storyGrid"></div>
+
+  <div class="submit-toggle">
+    <button onclick="toggleSubmit()">＋ Submit a dispatch for evaluation</button>
+  </div>
+  <div class="submit-panel" id="submitPanel">
+    <h3>Test &amp; ingest a dispatch</h3>
+    <label>Language</label>
+    <select id="inLang">
+      <option value="bn">Bangla (বাংলা)</option>
+      <option value="en" selected>English</option>
+      <option value="es">Español</option>
+      <option value="fr">Français</option>
+      <option value="de">Deutsch</option>
+      <option value="ar">العربية</option>
+      <option value="sw">Kiswahili</option>
+      <option value="ha">Hausa</option>
+      <option value="am">አማርኛ</option>
+    </select>
+    <label>Headline</label>
+    <input id="inTitle" type="text" placeholder="Dispatch headline...">
+    <label>Body</label>
+    <textarea id="inText" placeholder="Paste article content containing crisis keywords (e.g., flood, famine, power theft, outbreak)..."></textarea>
+    <button class="submit-btn" onclick="submitArticle()">Evaluate &amp; publish</button>
+    <div class="eval-result" id="evalResult"></div>
+  </div>
+</main>
 
 <script>
-    const langNames = {
-        "bn": "Bangla (বাংলা)",
-        "en": "English",
-        "es": "Spanish (Español)",
-        "de": "German (Deutsch)",
-        "fr": "French (Français)",
-        "ar": "Arabic (العربية)"
-    };
+// ---- Keyword matrix (subset shown here mirrors the full Python engine) ----
+const CATEGORIES = {
+  power_illegal_use: { label: "Power & Energy", weight: 45, words: ["বিদ্যুৎ চুরি","অবৈধ সংযোগ","electricity theft","power theft","سرقة الكهرباء","vol d'électricité","stromdiebstahl","robo de electricidad","wizi wa umeme","sace wutar lantarki","ኤሌክትሪክ ስርቆት"] },
+  food_security_and_hunger: { label: "Food Security", weight: 45, words: ["খাদ্য সংকট","দুর্ভিক্ষ","famine","hunger","food crisis","مجاعة","جوع","hungersnot","hambruna","njaa","baa la njaa","yunwa","ረሃብ"] },
+  economic_and_infrastructure_collapse: { label: "Economy & Infrastructure", weight: 45, words: ["অর্থনৈতিক সংকট","মুদ্রাস্ফীতি","economic crisis","inflation","power outage","blackout","أزمة اقتصادية","crise économique","wirtschaftskrise","crisis económica","mgogoro wa kiuchumi","rikicin tattalin arziki","የኢኮኖሚ ቀውስ"] },
+  public_health_and_epidemic_crisis: { label: "Public Health", weight: 45, words: ["স্বাস্থ্য সংকট","মহামারী","outbreak","epidemic","cholera","أزمة صحية","وباء","épidémie","epidemie","epidemia","mlipuko wa ugonjwa","annoba","ወረርሽኝ"] },
+  disaster_and_nature: { label: "Disasters", weight: 35, words: ["ভূমিকম্প","বন্যা","earthquake","flood","hurricane","tsunami","زلزال","فيضان","tremblement de terre","inondation","erdbeben","überschwemmung","terremoto","inundación","tetemeko la ardhi","mafuriko","girgizar kasa","የመሬት መንቀጥቀጥ"] },
+  security_and_conflict: { label: "Conflict & Security", weight: 35, words: ["হামলা","বিস্ফোরণ","attack","explosion","killed","هجوم","انفجار","attaque","explosion","angriff","ataque","explosión","shambulio","mlipuko","hari","fashewa","ጥቃት","ፍንዳታ"] },
+  urgency_boosters: { label: "Urgency Boosters", weight: 35, hidden: true, words: ["জরুরি","emergency","alert","critical","طوارئ","urgence","notfall","emergencia","dharura","gaggawa","አስቸኳይ"] }
+};
+const LANGS = ["bn","en","es","fr","de","ar","sw","ha","am"];
+const LANG_NAMES = {bn:"Bangla",en:"English",es:"Español",fr:"Français",de:"Deutsch",ar:"العربية",sw:"Kiswahili",ha:"Hausa",am:"አማርኛ"};
 
-    window.onload = function() {
-        fetchAllFocus();
-    };
+let allArticles = [];
+let coverage = {};
+let activeCategory = "all";
+let activeLang = "all";
 
-    async function fetchAllFocus() {
-        try {
-            const response = await fetch('/top-focus-all');
-            const data = await response.json();
-            const grid = document.getElementById('crisisGrid');
-            grid.innerHTML = '';
-
-            for (const [langCode, article] of Object.entries(data.top_articles)) {
-                const card = document.createElement('div');
-                card.className = 'lang-card';
-                
-                let contentHTML = `<div class="lang-title">${langNames[langCode] || langCode}</div>`;
-
-                if (article) {
-                    let tagsHTML = '';
-                    article.threat_categories.forEach(tag => {
-                        tagsHTML += `<span class="threat-tag">${tag.replace(/_/g, ' ')}</span>`;
-                    });
-
-                    contentHTML += `
-                        <div class="crisis-box">
-                            <div class="crisis-headline">${article.title}</div>
-                            <p style="font-size: 0.9em; margin: 5px 0;"><strong>Threat Score:</strong> <span class="metric">${article.concern_score}</span>/100</p>
-                            <p style="font-size: 0.8em; color: #aaa; margin: 5px 0;"><strong>Time:</strong> ${new Date(article.timestamp).toLocaleTimeString()}</p>
-                            <div>${tagsHTML}</div>
-                        </div>
-                    `;
-                } else {
-                    contentHTML += `
-                        <div class="no-crisis">
-                            ✅ Status Clear<br><small>No major national/global crises reported in the last 24h.</small>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = contentHTML;
-                grid.appendChild(card);
-            }
-        } catch (error) {
-            console.error("Error fetching crisis feed", error);
-        }
+function evaluate(title, text, lang) {
+  const combined = (title + " " + text).toLowerCase();
+  let score = 0, matched = [];
+  for (const [cat, def] of Object.entries(CATEGORIES)) {
+    for (const w of def.words) {
+      if (combined.includes(w.toLowerCase())) { score += def.weight; if (!matched.includes(cat)) matched.push(cat); break; }
     }
+  }
+  if (matched.length >= 2) score += 35;
+  const capped = Math.min(score, 100);
+  if (capped === 0) return null;
+  const covCounts = matched.map(c => coverage[c] || 0);
+  const minCov = covCounts.length ? Math.min(...covCounts) : 0;
+  const ignoredPriority = capped * (1 / (1 + minCov));
+  matched.forEach(c => { coverage[c] = (coverage[c] || 0) + 1; });
+  return { title, text: text.slice(0, 130), lang, score: capped, categories: matched.filter(c => !CATEGORIES[c].hidden),
+    coverage: minCov, ignoredPriority: Math.round(ignoredPriority * 10) / 10, ts: Date.now(), id: Math.random().toString(36).slice(2) };
+}
 
-    async function submitArticle() {
-        const lang = document.getElementById('inputLang').value;
-        const title = document.getElementById('inputTitle').value || "Breaking Update";
-        const text = document.getElementById('inputText').value;
+function addArticle(title, text, lang) {
+  const r = evaluate(title, text, lang);
+  if (!r) return null;
+  allArticles.push(r);
+  return r;
+}
 
-        if (!text) { alert("Please enter article text."); return; }
+const SEED = [
+  ["bn","বিদ্যুৎ চুরির অভিযোগে গ্রামে অসন্তোষ","গ্রামীণ এলাকায় অবৈধ সংযোগ ও বিদ্যুৎ চুরির অভিযোগ উঠেছে, স্থানীয় প্রশাসন তদন্ত শুরু করেছে।"],
+  ["en","Remote district hunger crisis draws little coverage","Aid workers report a worsening famine in a remote district, with malnutrition rising sharply among children, yet almost no national outlets have covered it."],
+  ["en","Coastal city hit by major flood","Emergency crews responded after a hurricane triggered flooding across the coastal city, displacing thousands."],
+  ["en","Coastal city flood, day 3 update","Recovery continues in the flood-hit coastal city as emergency services assess the damage from the hurricane."],
+  ["en","Coastal flood relief efforts expand","International aid arrives as flood recovery continues in the coastal city following the hurricane."],
+  ["en","Coastal flood: government response criticized","Officials face criticism over the pace of flood recovery in the coastal city hit by the hurricane."],
+  ["es","Crisis de agua ignorada en la región andina","Comunidades rurales enfrentan una grave escasez de agua y colapso económico, con apenas cobertura mediática nacional."],
+  ["fr","Épidémie de choléra signalée dans une zone rurale","Une épidémie de choléra se propage dans une zone rurale isolée, provoquant une crise sanitaire critique largement passée sous silence."],
+  ["de","Stromdiebstahl und Infrastrukturkollaps in Grenzregion","Berichte über systematischen Stromdiebstahl und einen wirtschaftlichen Zusammenbruch in einer abgelegenen Grenzregion bleiben weitgehend unbeachtet."],
+  ["ar","أزمة غذائية حرجة في منطقة نائية","تقارير عاجلة تشير إلى مجاعة وسوء تغذية حاد في منطقة نائية، مع تغطية إعلامية شبه منعدمة."],
+  ["sw","Mgogoro wa njaa uliopuuzwa mkoani","Ripoti za dharura zaonyesha baa la njaa na utapiamlo mkoani, huku vyombo vya habari vikitoa uangalizi mdogo sana."],
+  ["ha","Rikicin yunwa da aka yi watsi da shi a yankin karkara","Rahotanni sun nuna yunwa da rashin abinci mai gina jiki a yankin karkara, amma babu wani rahoto game da shi."],
+  ["am","በገጠር አካባቢ የተዘነጋ የረሃብ ቀውስ","ድንገተኛ ሪፖርቶች እንደሚያሳዩት በገጠር አካባቢ ከባድ ረሃብ እና የተመጣጠነ ምግብ እጦት ተከስቷል፣ ሆኖም የመገናኛ ብዙኃን ሽፋን በጣም አነስተኛ ነው።"],
+];
+SEED.forEach(([lang, title, text]) => addArticle(title, text, lang));
 
-        try {
-            const response = await fetch('/ingest-global', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: "test_" + Date.now(), title: title, text: text, language: lang })
-            });
+function renderCatNav() {
+  const cats = Object.entries(CATEGORIES).filter(([k, v]) => !v.hidden);
+  const nav = document.getElementById('catNav');
+  nav.innerHTML = `<button class="cat-btn ${activeCategory==='all'?'active':''}" onclick="setCategory('all')">All</button>` +
+    cats.map(([key, def]) => `<button class="cat-btn ${activeCategory===key?'active':''}" onclick="setCategory('${key}')">${def.label}</button>`).join('');
+}
 
-            if (response.ok) {
-                document.getElementById('inputText').value = '';
-                document.getElementById('inputTitle').value = '';
-                alert("Article evaluated successfully!");
-                fetchAllFocus(); // Refresh the grid
-            }
-        } catch (error) {
-            alert("Failed to submit article.");
-        }
-    }
+function renderLangTicker() {
+  const el = document.getElementById('langTicker');
+  const allBtn = `<button class="lang-pill ${activeLang==='all'?'active':''}" onclick="setLang('all')">All languages <span class="count">${allArticles.length}</span></button>`;
+  el.innerHTML = allBtn + LANGS.map(lang => {
+    const items = allArticles.filter(a => a.lang === lang);
+    const underCount = items.filter(a => a.coverage <= 1).length;
+    return `<button class="lang-pill ${activeLang===lang?'active':''}" onclick="setLang('${lang}')">
+      <span class="flag-dot ${underCount>0?'under':''}"></span>${LANG_NAMES[lang]} <span class="count">${items.length}</span>
+    </button>`;
+  }).join('');
+}
+
+function filtered() {
+  return allArticles.filter(a =>
+    (activeCategory === 'all' || a.categories.includes(activeCategory)) &&
+    (activeLang === 'all' || a.lang === activeLang)
+  );
+}
+
+function renderLead() {
+  const items = filtered();
+  const best = items.slice().sort((a,b) => b.ignoredPriority - a.ignoredPriority)[0];
+  const container = document.getElementById('leadContainer');
+  if (!best) { container.innerHTML = ''; return; }
+  const catLabel = CATEGORIES[best.categories[0]] ? CATEGORIES[best.categories[0]].label : 'General';
+  container.innerHTML = `
+    <div class="lead-grid">
+      <div class="lead-media"><span class="cat-tag">${catLabel}</span></div>
+      <div>
+        <div class="lead-eyebrow">Least covered, most urgent — ${LANG_NAMES[best.lang]}</div>
+        <h1>${best.title}</h1>
+        <p class="snip">${best.text}</p>
+        <div class="byline">${best.categories.map(c => CATEGORIES[c].label).join(' · ')}</div>
+        <div class="signal-box">
+          <h4>Signal reading</h4>
+          <div class="sig-row"><span>Severity score</span><span class="v crimson">${best.score}</span></div>
+          <div class="sig-row"><span>Ignored priority</span><span class="v amber">${best.ignoredPriority}</span></div>
+          <div class="sig-row"><span>Outlets covering it</span><span class="v">${best.coverage}</span></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderStoryGrid() {
+  const items = filtered().slice().sort((a,b) => b.ignoredPriority - a.ignoredPriority);
+  const grid = document.getElementById('storyGrid');
+  document.getElementById('sectionTitle').textContent =
+    (activeCategory === 'all' ? 'All dispatches' : CATEGORIES[activeCategory].label) +
+    (activeLang === 'all' ? '' : ` — ${LANG_NAMES[activeLang]}`);
+  document.getElementById('sectionCount').textContent = `${items.length} dispatches`;
+
+  if (!items.length) { grid.innerHTML = `<div class="empty-state">No dispatches match this filter yet.</div>`; return; }
+
+  grid.innerHTML = items.map(item => `
+    <div class="story-card">
+      <div class="story-thumb">${LANG_NAMES[item.lang]}</div>
+      <div class="cat-eyebrow">${item.categories.map(c => CATEGORIES[c].label).join(' · ') || 'General'}</div>
+      <h3>${item.title}</h3>
+      <p>${item.text}</p>
+      <div class="story-footer">
+        <span class="lang">${LANG_NAMES[item.lang]}</span>
+        <span class="badge ${item.coverage <= 1 ? 'under' : 'covered'}">${item.coverage <= 1 ? 'under-covered' : item.coverage + ' outlets'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTicker() {
+  const ignoredCount = allArticles.filter(a => a.coverage <= 1).length;
+  document.getElementById('tickerStat').textContent = `${ignoredCount} of ${allArticles.length} dispatches flagged as under-covered`;
+  document.getElementById('utilTime').textContent = new Date().toLocaleString();
+}
+
+function setCategory(cat) { activeCategory = cat; renderCatNav(); renderAll(); }
+function setLang(lang) { activeLang = lang; renderLangTicker(); renderAll(); }
+function renderAll() { renderLead(); renderStoryGrid(); renderTicker(); }
+
+function toggleSubmit() { document.getElementById('submitPanel').classList.toggle('open'); }
+
+function submitArticle() {
+  const lang = document.getElementById('inLang').value;
+  const title = document.getElementById('inTitle').value.trim();
+  const text = document.getElementById('inText').value.trim();
+  const resultEl = document.getElementById('evalResult');
+  if (!title || !text) { resultEl.textContent = 'Add a headline and body first.'; return; }
+  const result = addArticle(title, text, lang);
+  if (!result) {
+    resultEl.textContent = 'No crisis signal detected in this text — not published to the wire.';
+  } else {
+    resultEl.textContent = `Published. Severity ${result.score} · Ignored priority ${result.ignoredPriority} · Categories: ${result.categories.map(c=>CATEGORIES[c].label).join(', ')}`;
+    renderCatNav(); renderLangTicker(); renderAll();
+  }
+}
+
+renderCatNav();
+renderLangTicker();
+renderAll();
 </script>
-
 </body>
 </html>
